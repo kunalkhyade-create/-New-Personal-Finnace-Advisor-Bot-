@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinanceBot — AI Personal Finance Advisor</title>
+  <meta name="description" content="AI-powered personal finance advisor that generates personalised budget plans, spending analysis, and saving suggestions instantly." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <!-- ======================================================
+       HEADER
+  ====================================================== -->
+  <header class="site-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">FinanceBot</span>
+          <span class="brand-tag">AI Personal Finance Advisor</span>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <span class="nav-badge"><i class="fa-solid fa-bolt"></i> Powered by Gemini 2.0 Flash</span>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ======================================================
+       HERO
+  ====================================================== -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <h1 class="hero-title">
+        Take Control of<br/>
+        <span class="gradient-text">Your Finances</span>
+      </h1>
+      <p class="hero-subtitle">
+        Enter your income and expenses below — our AI will instantly generate a personalised budget plan,
+        analyse your spending, and suggest targeted savings strategies.
+      </p>
+      <div class="hero-stats">
+        <div class="stat-chip"><i class="fa-solid fa-brain"></i> AI-Generated Budget</div>
+        <div class="stat-chip"><i class="fa-solid fa-magnifying-glass-chart"></i> Spending Analysis</div>
+        <div class="stat-chip"><i class="fa-solid fa-piggy-bank"></i> Saving Suggestions</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       MAIN CONTENT
+  ====================================================== -->
+  <main class="main-content container">
+
+    <!-- INPUT CARD -->
+    <section class="card input-card" id="input-section">
+      <div class="card-header">
+        <i class="fa-solid fa-sliders card-header-icon"></i>
+        <h2 class="card-title">Your Financial Profile</h2>
+      </div>
+
+      <form id="finance-form" novalidate>
+
+        <!-- Income -->
+        <div class="form-group">
+          <label for="income" class="form-label">
+            <i class="fa-solid fa-indian-rupee-sign"></i> Monthly Take-Home Income
+          </label>
+          <div class="input-wrapper">
+            <span class="input-prefix">₹</span>
+            <input
+              type="number"
+              id="income"
+              name="income"
+              class="form-input"
+              placeholder="e.g. 75000"
+              min="1"
+              max="10000000"
+              required
+              aria-label="Monthly income in rupees"
+            />
+          </div>
+        </div>
+
+        <!-- Expenses Grid -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fa-solid fa-receipt"></i> Monthly Expenses
+          </label>
+          <p class="form-hint">Fill in the categories that apply. Leave others blank.</p>
+
+          <div class="expense-grid">
+            {% set expense_list = [
+              ("rent",          "fa-home",           "Rent / Housing"),
+              ("food",          "fa-shopping-basket", "Groceries & Food"),
+              ("transport",     "fa-car",            "Transport"),
+              ("dining",        "fa-utensils",       "Dining Out"),
+              ("entertainment", "fa-film",           "Entertainment"),
+              ("utilities",     "fa-bolt",           "Utilities"),
+              ("savings",       "fa-piggy-bank",     "Savings"),
+              ("health",        "fa-heartbeat",      "Health & Medical"),
+              ("education",     "fa-graduation-cap", "Education"),
+              ("shopping",      "fa-bag-shopping",   "Shopping"),
+              ("other",         "fa-ellipsis",       "Miscellaneous")
+            ] %}
+
+            {% for key, icon, label in expense_list %}
+            <div class="expense-item">
+              <label for="exp-{{ key }}" class="expense-label">
+                <i class="fa-solid {{ icon }} expense-icon"></i>
+                {{ label }}
+              </label>
+              <div class="input-wrapper small">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="exp-{{ key }}"
+                  name="{{ key }}"
+                  class="form-input expense-input"
+                  placeholder="0"
+                  min="0"
+                  max="5000000"
+                  aria-label="{{ label }} expense"
+                />
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Financial Goal -->
+        <div class="form-group">
+          <label for="goal" class="form-label">
+            <i class="fa-solid fa-bullseye"></i> Primary Financial Goal
+          </label>
+          <div class="select-wrapper">
+            <select id="goal" name="goal" class="form-select" aria-label="Select your financial goal">
+              <option value="emergency_fund">🛡️ Build Emergency Fund</option>
+              <option value="investment">📈 Start Investing (Mutual Funds / SIPs)</option>
+              <option value="vacation">✈️ Save for Vacation</option>
+              <option value="gadget">💻 Save for a Gadget</option>
+              <option value="debt_repayment">💳 Pay Off Debt</option>
+              <option value="home_purchase">🏠 Home Down Payment</option>
+              <option value="retirement">🌅 Build Retirement Corpus</option>
+              <option value="education">🎓 Education / Certification</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow"></i>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" id="submit-btn" class="btn-primary">
+          <span id="btn-text">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Analyse My Finances
+          </span>
+          <span id="btn-loader" class="btn-loader hidden" aria-hidden="true">
+            <span class="spinner"></span> Analysing...
+          </span>
+        </button>
+
+        <!-- Error message -->
+        <div id="error-banner" class="error-banner hidden" role="alert"></div>
+
+      </form>
+    </section>
+
+    <!-- ====================================================
+         RESULTS SECTION (revealed after analysis)
+    ==================================================== -->
+    <section id="results-section" class="results-section hidden" aria-live="polite">
+
+      <!-- Summary Banner -->
+      <div class="summary-banner" id="summary-banner">
+        <div class="summary-icon"><i class="fa-solid fa-circle-info"></i></div>
+        <p id="summary-text" class="summary-text"></p>
+      </div>
+
+      <div class="results-grid">
+
+        <!-- LEFT: Budget -->
+        <div class="results-col">
+          <div class="card results-card">
+            <div class="card-header">
+              <i class="fa-solid fa-wallet card-header-icon"></i>
+              <h2 class="card-title">Personalised Budget</h2>
+            </div>
+            <div id="budget-container" class="budget-list"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Analysis + Suggestions -->
+        <div class="results-col right-col">
+
+          <!-- Spending Analysis -->
+          <div class="card results-card">
+            <div class="card-header">
+              <i class="fa-solid fa-chart-pie card-header-icon"></i>
+              <h2 class="card-title">Spending Analysis</h2>
+            </div>
+            <div id="analysis-container" class="analysis-chips"></div>
+          </div>
+
+          <!-- Saving Suggestions -->
+          <div class="card results-card">
+            <div class="card-header">
+              <i class="fa-solid fa-piggy-bank card-header-icon"></i>
+              <h2 class="card-title">Saving Suggestions</h2>
+            </div>
+            <ol id="suggestions-container" class="suggestions-list"></ol>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================
+       FOOTER
+  ====================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>
+        <i class="fa-solid fa-shield-halved"></i>
+        Your financial data is processed in real-time and never stored.
+      </p>
+      <p class="footer-credit">
+        Built with <i class="fa-solid fa-heart accent"></i> using Flask &amp; Gemini AI
+      </p>
+    </div>
+  </footer>
+
+  <!-- App Script -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

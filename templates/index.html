@@ -34,7 +34,10 @@
         </div>
       </div>
       <nav class="header-nav">
-        <span class="nav-badge"><i class="fa-solid fa-bolt"></i> Powered by Gemini 2.0 Flash</span>
+        <button type="button" id="api-key-btn" class="nav-badge-btn" aria-haspopup="dialog" aria-expanded="false" title="Configure Google Gemini API Key">
+          <i class="fa-solid fa-bolt"></i>
+          <span id="nav-mode-text">AI Status</span>
+        </button>
       </nav>
     </div>
   </header>
@@ -184,7 +187,10 @@
 
       <!-- Summary Banner -->
       <div class="summary-banner" id="summary-banner">
-        <div class="summary-icon"><i class="fa-solid fa-circle-info"></i></div>
+        <div class="summary-top">
+          <div class="summary-icon"><i class="fa-solid fa-circle-info"></i></div>
+          <span id="engine-badge" class="engine-badge smart"><i class="fa-solid fa-brain"></i> Smart Advisor</span>
+        </div>
         <p id="summary-text" class="summary-text"></p>
       </div>
 
@@ -227,6 +233,50 @@
     </section>
 
   </main>
+
+  <!-- ======================================================
+       API KEY MODAL
+  ====================================================== -->
+  <div id="api-key-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-key modal-icon"></i>
+          <h3 id="modal-title" class="modal-title">AI Engine Settings</h3>
+        </div>
+        <button type="button" id="modal-close-btn" class="modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          Your prototype includes a built-in <strong>Smart Financial Advisory Engine</strong> that works out of the box without requiring an API key. To activate live Google Gemini 2.0 AI responses, paste your API key below.
+        </p>
+        <div class="form-group">
+          <label for="gemini-key-input" class="form-label">Google Gemini API Key</label>
+          <div class="input-wrapper">
+            <span class="input-prefix"><i class="fa-solid fa-lock"></i></span>
+            <input
+              type="password"
+              id="gemini-key-input"
+              class="form-input"
+              placeholder="AIzaSy..."
+              autocomplete="off"
+            />
+            <button type="button" id="toggle-key-visibility" class="btn-input-action" title="Toggle visibility">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+          <span class="form-hint">
+            Get your key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          </span>
+        </div>
+        <div id="modal-feedback" class="modal-feedback hidden"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="clear-key-btn" class="btn-secondary">Use Smart Engine</button>
+        <button type="button" id="save-key-btn" class="btn-primary-sm">Save &amp; Activate</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ======================================================
        FOOTER

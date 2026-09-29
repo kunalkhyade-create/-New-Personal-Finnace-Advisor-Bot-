@@ -1,6 +1,7 @@
 /**
  * main.js — Personal Finance Advisor Bot
- * Handles form submission, async fetch to /analyse, and dynamic result rendering.
+ * Handles form submission, async fetch to /analyse, dynamic result rendering,
+ * and seamless API key configuration / Smart Advisory engine toggling.
  */
 
 "use strict";
@@ -8,16 +9,28 @@
 /* ------------------------------------------------------------------
    DOM References
 ------------------------------------------------------------------ */
-const form            = document.getElementById("finance-form");
-const submitBtn       = document.getElementById("submit-btn");
-const btnText         = document.getElementById("btn-text");
-const btnLoader       = document.getElementById("btn-loader");
-const errorBanner     = document.getElementById("error-banner");
-const resultsSection  = document.getElementById("results-section");
-const summaryText     = document.getElementById("summary-text");
-const budgetContainer = document.getElementById("budget-container");
-const analysisContainer = document.getElementById("analysis-container");
+const form               = document.getElementById("finance-form");
+const submitBtn          = document.getElementById("submit-btn");
+const btnText            = document.getElementById("btn-text");
+const btnLoader          = document.getElementById("btn-loader");
+const errorBanner        = document.getElementById("error-banner");
+const resultsSection     = document.getElementById("results-section");
+const summaryText        = document.getElementById("summary-text");
+const engineBadge        = document.getElementById("engine-badge");
+const budgetContainer    = document.getElementById("budget-container");
+const analysisContainer  = document.getElementById("analysis-container");
 const suggestionsContainer = document.getElementById("suggestions-container");
+
+// API Key Modal Elements
+const apiKeyBtn          = document.getElementById("api-key-btn");
+const navModeText        = document.getElementById("nav-mode-text");
+const apiKeyModal        = document.getElementById("api-key-modal");
+const modalCloseBtn      = document.getElementById("modal-close-btn");
+const geminiKeyInput     = document.getElementById("gemini-key-input");
+const toggleKeyVisBtn    = document.getElementById("toggle-key-visibility");
+const saveKeyBtn         = document.getElementById("save-key-btn");
+const clearKeyBtn        = document.getElementById("clear-key-btn");
+const modalFeedback      = document.getElementById("modal-feedback");
 
 /* ------------------------------------------------------------------
    Category icon map (mirrors CATEGORY_TIPS in app.py)
@@ -37,13 +50,146 @@ const CATEGORY_ICONS = {
 };
 
 /* ------------------------------------------------------------------
+   API Key Management
+------------------------------------------------------------------ */
+const STORAGE_KEY = "financebot_gemini_key";
+
+function getStoredApiKey() {
+  const key = localStorage.getItem(STORAGE_KEY) || "";
+  return key.trim();
+}
+
+function updateNavAiStatus(isGeminiActive) {
+  if (!navModeText || !apiKeyBtn) return;
+  if (isGeminiActive) {
+    navModeText.innerHTML = '<i class="fa-solid fa-sparkles"></i> Gemini 2.0 AI';
+    apiKeyBtn.classList.add("active-ai");
+  } else {
+    navModeText.innerHTML = '<i class="fa-solid fa-bolt"></i> Smart Advisor';
+    apiKeyBtn.classList.remove("active-ai");
+  }
+}
+
+async function syncApiKeyStatus() {
+  const localKey = getStoredApiKey();
+  if (localKey) {
+    updateNavAiStatus(true);
+    return;
+  }
+
+  // Check backend .env configuration
+  try {
+    const res = await fetch("/api/key-status");
+    if (res.ok) {
+      const data = await res.json();
+      updateNavAiStatus(data.configured);
+    }
+  } catch (e) {
+    console.debug("Could not reach /api/key-status", e);
+  }
+}
+
+// Modal open/close handlers
+if (apiKeyBtn) {
+  apiKeyBtn.addEventListener("click", () => {
+    const currentKey = getStoredApiKey();
+    if (geminiKeyInput) geminiKeyInput.value = currentKey;
+    if (modalFeedback) {
+      modalFeedback.className = "modal-feedback hidden";
+      modalFeedback.textContent = "";
+    }
+    apiKeyModal.classList.remove("hidden");
+    if (geminiKeyInput) geminiKeyInput.focus();
+  });
+}
+
+if (modalCloseBtn) {
+  modalCloseBtn.addEventListener("click", () => {
+    apiKeyModal.classList.add("hidden");
+  });
+}
+
+// Close when clicking modal backdrop
+if (apiKeyModal) {
+  apiKeyModal.addEventListener("click", (e) => {
+    if (e.target === apiKeyModal) {
+      apiKeyModal.classList.add("hidden");
+    }
+  });
+}
+
+// Toggle password visibility
+if (toggleKeyVisBtn && geminiKeyInput) {
+  toggleKeyVisBtn.addEventListener("click", () => {
+    const isPassword = geminiKeyInput.type === "password";
+    geminiKeyInput.type = isPassword ? "text" : "password";
+    toggleKeyVisBtn.innerHTML = isPassword
+      ? '<i class="fa-regular fa-eye-slash"></i>'
+      : '<i class="fa-regular fa-eye"></i>';
+  });
+}
+
+// Save Key
+if (saveKeyBtn && geminiKeyInput) {
+  saveKeyBtn.addEventListener("click", async () => {
+    const key = geminiKeyInput.value.trim();
+    if (!key) {
+      showModalFeedback("Please enter a valid Gemini API key or click 'Use Smart Engine'.", "error");
+      return;
+    }
+
+    try {
+      // Send to server to persist in .env if writable
+      const res = await fetch("/api/key-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ api_key: key }),
+      });
+      const data = await res.json();
+      
+      localStorage.setItem(STORAGE_KEY, key);
+      updateNavAiStatus(true);
+      showModalFeedback("Key activated! Live Gemini 2.0 AI mode is now on.", "success");
+      setTimeout(() => {
+        apiKeyModal.classList.add("hidden");
+      }, 1200);
+    } catch (err) {
+      // Fallback: save to localStorage anyway so request can pass it
+      localStorage.setItem(STORAGE_KEY, key);
+      updateNavAiStatus(true);
+      showModalFeedback("Key saved in browser! Live Gemini AI is active.", "success");
+      setTimeout(() => {
+        apiKeyModal.classList.add("hidden");
+      }, 1200);
+    }
+  });
+}
+
+// Clear key / revert to Smart Advisory Engine
+if (clearKeyBtn) {
+  clearKeyBtn.addEventListener("click", () => {
+    localStorage.removeItem(STORAGE_KEY);
+    if (geminiKeyInput) geminiKeyInput.value = "";
+    updateNavAiStatus(false);
+    showModalFeedback("Switched to built-in Smart Advisory Engine (No key needed).", "success");
+    setTimeout(() => {
+      apiKeyModal.classList.add("hidden");
+    }, 1000);
+  });
+}
+
+function showModalFeedback(msg, type) {
+  if (!modalFeedback) return;
+  modalFeedback.textContent = msg;
+  modalFeedback.className = `modal-feedback ${type}`;
+}
+
+/* ------------------------------------------------------------------
    Helpers
 ------------------------------------------------------------------ */
 
 /**
  * Format a number as an Indian-locale rupee string.
- * @param {number} amount
- * @returns {string}
  */
 function formatRupee(amount) {
   if (typeof amount !== "number" || isNaN(amount)) return "₹0";
@@ -52,12 +198,9 @@ function formatRupee(amount) {
 
 /**
  * Derive icon class from category name.
- * @param {string} category
- * @returns {string}
  */
 function iconFor(category) {
   const key = category.toLowerCase().replace(/[^a-z]/g, "");
-  // Try exact match first, then partial match
   for (const [k, v] of Object.entries(CATEGORY_ICONS)) {
     if (key.includes(k) || k.includes(key)) return v;
   }
@@ -72,8 +215,7 @@ function clamp(val, min, max) {
 }
 
 /**
- * Show or hide the loading state on the submit button.
- * @param {boolean} loading
+ * Show or hide loading state on the submit button.
  */
 function setLoading(loading) {
   submitBtn.disabled = loading;
@@ -83,7 +225,6 @@ function setLoading(loading) {
 
 /**
  * Display an error message in the error banner.
- * @param {string} message
  */
 function showError(message) {
   errorBanner.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${message}`;
@@ -102,11 +243,6 @@ function clearError() {
 /* ------------------------------------------------------------------
    Form Collection
 ------------------------------------------------------------------ */
-
-/**
- * Read all form values and return a structured payload.
- * @returns {{ income: number, expenses: Object, goal: string } | null}
- */
 function collectFormData() {
   const income = parseFloat(document.getElementById("income").value);
   if (!income || income <= 0) {
@@ -130,17 +266,18 @@ function collectFormData() {
     return null;
   }
 
-  return { income, expenses, goal };
+  const payload = { income, expenses, goal };
+  const storedKey = getStoredApiKey();
+  if (storedKey) {
+    payload.api_key = storedKey;
+  }
+
+  return payload;
 }
 
 /* ------------------------------------------------------------------
    Render Functions
 ------------------------------------------------------------------ */
-
-/**
- * Render the personalised budget section.
- * @param {Array} budget
- */
 function renderBudget(budget) {
   budgetContainer.innerHTML = "";
 
@@ -150,12 +287,11 @@ function renderBudget(budget) {
   }
 
   budget.forEach((item) => {
-    const status     = (item.status || "ok").toLowerCase();
-    const actual     = item.actual     || 0;
+    const status      = (item.status || "ok").toLowerCase();
+    const actual      = item.actual     || 0;
     const recommended = item.recommended || 0;
-    const pct        = item.percentage  || 0;
+    const pct         = item.percentage  || 0;
 
-    // Progress: how much of the recommended allocation is being used
     const usagePct = recommended > 0
       ? clamp(Math.round((actual / recommended) * 100), 0, 100)
       : 0;
@@ -188,7 +324,6 @@ function renderBudget(budget) {
 
     budgetContainer.appendChild(el);
 
-    // Animate progress bar after a tick
     requestAnimationFrame(() => {
       const fill = el.querySelector(".progress-bar-fill");
       if (fill) {
@@ -200,10 +335,6 @@ function renderBudget(budget) {
   });
 }
 
-/**
- * Render the spending analysis chips.
- * @param {Array} analysis
- */
 function renderAnalysis(analysis) {
   analysisContainer.innerHTML = "";
 
@@ -232,10 +363,6 @@ function renderAnalysis(analysis) {
   });
 }
 
-/**
- * Render the saving suggestions list.
- * @param {string[]} suggestions
- */
 function renderSuggestions(suggestions) {
   suggestionsContainer.innerHTML = "";
 
@@ -251,36 +378,32 @@ function renderSuggestions(suggestions) {
   });
 }
 
-/**
- * Render all results into the DOM and reveal the results section.
- * @param {{ budget, analysis, suggestions, summary }} data
- */
 function renderResults(data) {
-  // Summary
   if (data.summary) {
     summaryText.textContent = data.summary;
+  }
+
+  // Update engine badge
+  if (engineBadge) {
+    if (data.source === "gemini") {
+      engineBadge.className = "engine-badge gemini";
+      engineBadge.innerHTML = '<i class="fa-solid fa-sparkles"></i> Gemini 2.0 AI';
+    } else {
+      engineBadge.className = "engine-badge smart";
+      engineBadge.innerHTML = '<i class="fa-solid fa-brain"></i> Smart Advisor';
+    }
   }
 
   renderBudget(data.budget);
   renderAnalysis(data.analysis);
   renderSuggestions(data.suggestions);
 
-  // Reveal & scroll
   resultsSection.classList.remove("hidden");
   setTimeout(() => {
     resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
   }, 100);
 }
 
-/* ------------------------------------------------------------------
-   Security helper
------------------------------------------------------------------- */
-
-/**
- * Escape HTML special characters to prevent XSS.
- * @param {string} str
- * @returns {string}
- */
 function escapeHtml(str) {
   const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" };
   return String(str).replace(/[&<>"']/g, (m) => map[m]);
@@ -299,9 +422,15 @@ form.addEventListener("submit", async (event) => {
   setLoading(true);
 
   try {
+    const headers = { "Content-Type": "application/json" };
+    const storedKey = getStoredApiKey();
+    if (storedKey) {
+      headers["X-Gemini-API-Key"] = storedKey;
+    }
+
     const response = await fetch("/analyse", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(payload),
     });
 
@@ -317,19 +446,22 @@ form.addEventListener("submit", async (event) => {
 
   } catch (err) {
     console.error("Fetch error:", err);
-    showError("Network error. Please check your connection and try again.");
+    showError("Network connection error. Please make sure the Flask server is running.");
   } finally {
     setLoading(false);
   }
 });
 
 /* ------------------------------------------------------------------
-   Auto-hide results section on new form interaction
+   Live input listeners
 ------------------------------------------------------------------ */
 form.querySelectorAll("input, select").forEach((el) => {
   el.addEventListener("input", () => {
-    // Optionally hide results when the user starts editing again
-    // resultsSection.classList.add("hidden");
     clearError();
   });
+});
+
+// Initialise API status on page load
+document.addEventListener("DOMContentLoaded", () => {
+  syncApiKeyStatus();
 });

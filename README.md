@@ -4,12 +4,16 @@
 ![Flask](https://img.shields.io/badge/Flask-3.0.3-000000?style=flat-square&logo=flask&logoColor=white)
 ![Gemini](https://img.shields.io/badge/Google%20Gemini-2.0%20Flash-4285F4?style=flat-square&logo=google&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+[![Final Report](https://img.shields.io/badge/📄%20Final%20Project%20Report-View%20Here-blueviolet?style=flat-square)](./REPORT.md)
 
 An AI-powered personal finance advisor built with **Flask** and **Google Gemini 2.0 Flash**. Enter your monthly income and expenses, set a financial goal, and receive a personalised budget plan, spending analysis, and saving suggestions — instantly.
 
 > 🤖 **No API key? No problem.** The built-in **Smart Advisory Engine** works fully offline using the 50/30/20 rule and Indian household benchmarks — zero configuration required.
 
+> 📄 **[View the Full Project Report →](./REPORT.md)**
+
 ---
+
 
 ## ✨ Features
 

@@ -9,44 +9,44 @@
 /* ------------------------------------------------------------------
    DOM References
 ------------------------------------------------------------------ */
-const form               = document.getElementById("finance-form");
-const submitBtn          = document.getElementById("submit-btn");
-const btnText            = document.getElementById("btn-text");
-const btnLoader          = document.getElementById("btn-loader");
-const errorBanner        = document.getElementById("error-banner");
-const resultsSection     = document.getElementById("results-section");
-const summaryText        = document.getElementById("summary-text");
-const engineBadge        = document.getElementById("engine-badge");
-const budgetContainer    = document.getElementById("budget-container");
-const analysisContainer  = document.getElementById("analysis-container");
+const form = document.getElementById("finance-form");
+const submitBtn = document.getElementById("submit-btn");
+const btnText = document.getElementById("btn-text");
+const btnLoader = document.getElementById("btn-loader");
+const errorBanner = document.getElementById("error-banner");
+const resultsSection = document.getElementById("results-section");
+const summaryText = document.getElementById("summary-text");
+const engineBadge = document.getElementById("engine-badge");
+const budgetContainer = document.getElementById("budget-container");
+const analysisContainer = document.getElementById("analysis-container");
 const suggestionsContainer = document.getElementById("suggestions-container");
 
 // API Key Modal Elements
-const apiKeyBtn          = document.getElementById("api-key-btn");
-const navModeText        = document.getElementById("nav-mode-text");
-const apiKeyModal        = document.getElementById("api-key-modal");
-const modalCloseBtn      = document.getElementById("modal-close-btn");
-const geminiKeyInput     = document.getElementById("gemini-key-input");
-const toggleKeyVisBtn    = document.getElementById("toggle-key-visibility");
-const saveKeyBtn         = document.getElementById("save-key-btn");
-const clearKeyBtn        = document.getElementById("clear-key-btn");
-const modalFeedback      = document.getElementById("modal-feedback");
+const apiKeyBtn = document.getElementById("api-key-btn");
+const navModeText = document.getElementById("nav-mode-text");
+const apiKeyModal = document.getElementById("api-key-modal");
+const modalCloseBtn = document.getElementById("modal-close-btn");
+const geminiKeyInput = document.getElementById("gemini-key-input");
+const toggleKeyVisBtn = document.getElementById("toggle-key-visibility");
+const saveKeyBtn = document.getElementById("save-key-btn");
+const clearKeyBtn = document.getElementById("clear-key-btn");
+const modalFeedback = document.getElementById("modal-feedback");
 
 /* ------------------------------------------------------------------
    Category icon map (mirrors CATEGORY_TIPS in app.py)
 ------------------------------------------------------------------ */
 const CATEGORY_ICONS = {
-  "rent":          "fa-home",
-  "food":          "fa-shopping-basket",
-  "transport":     "fa-car",
-  "dining":        "fa-utensils",
+  "rent": "fa-home",
+  "food": "fa-shopping-basket",
+  "transport": "fa-car",
+  "dining": "fa-utensils",
   "entertainment": "fa-film",
-  "utilities":     "fa-bolt",
-  "savings":       "fa-piggy-bank",
-  "health":        "fa-heartbeat",
-  "education":     "fa-graduation-cap",
-  "shopping":      "fa-bag-shopping",
-  "other":         "fa-ellipsis",
+  "utilities": "fa-bolt",
+  "savings": "fa-piggy-bank",
+  "health": "fa-heartbeat",
+  "education": "fa-graduation-cap",
+  "shopping": "fa-bag-shopping",
+  "other": "fa-ellipsis",
 };
 
 /* ------------------------------------------------------------------
@@ -146,7 +146,7 @@ if (saveKeyBtn && geminiKeyInput) {
         body: JSON.stringify({ api_key: key }),
       });
       const data = await res.json();
-      
+
       localStorage.setItem(STORAGE_KEY, key);
       updateNavAiStatus(true);
       showModalFeedback("Key activated! Live Gemini 2.0 AI mode is now on.", "success");
@@ -287,18 +287,18 @@ function renderBudget(budget) {
   }
 
   budget.forEach((item) => {
-    const status      = (item.status || "ok").toLowerCase();
-    const actual      = item.actual     || 0;
+    const status = (item.status || "ok").toLowerCase();
+    const actual = item.actual || 0;
     const recommended = item.recommended || 0;
-    const pct         = item.percentage  || 0;
+    const pct = item.percentage || 0;
 
     const usagePct = recommended > 0
       ? clamp(Math.round((actual / recommended) * 100), 0, 100)
       : 0;
 
-    const icon     = iconFor(item.category || "");
+    const icon = iconFor(item.category || "");
     const category = item.category || "Category";
-    const tip      = item.tip || "";
+    const tip = item.tip || "";
 
     const el = document.createElement("div");
     el.className = "budget-item";
@@ -344,10 +344,10 @@ function renderAnalysis(analysis) {
   }
 
   analysis.forEach((item) => {
-    const status     = (item.status || "ok").toLowerCase();
-    const pctUsed    = item.percentage_used || 0;
-    const insight    = item.insight || "";
-    const category   = item.category || "Category";
+    const status = (item.status || "ok").toLowerCase();
+    const pctUsed = item.percentage_used || 0;
+    const insight = item.insight || "";
+    const category = item.category || "Category";
 
     const chip = document.createElement("div");
     chip.className = `analysis-chip ${status}`;

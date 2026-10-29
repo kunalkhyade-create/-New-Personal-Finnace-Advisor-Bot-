@@ -3,8 +3,11 @@
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-3.0.3-000000?style=flat-square&logo=flask&logoColor=white)
 ![Gemini](https://img.shields.io/badge/Google%20Gemini-2.0%20Flash-4285F4?style=flat-square&logo=google&logoColor=white)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen?style=flat-square&logo=github)](https://kunalkhyade-create.github.io/-New-Personal-Finnace-Advisor-Bot-/)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 [![Final Report](https://img.shields.io/badge/Report-View%20Here-blueviolet?style=flat-square)](./REPORT.md)
+
+> 🚀 **Live Demo**: [https://kunalkhyade-create.github.io/-New-Personal-Finnace-Advisor-Bot-/](https://kunalkhyade-create.github.io/-New-Personal-Finnace-Advisor-Bot-/)
 
 > An AI-powered personal finance advisor built with **Flask** and **Google Gemini 2.0 Flash**.
 > Enter your monthly income and expenses, choose a financial goal, and receive a personalised budget plan,
@@ -312,7 +315,30 @@ can write to disk, to `.env` for persistence across restarts.
 
 ---
 
-## 🌍 Public Deployment (Ngrok)
+## 🌐 Deployment Options
+
+### 1. GitHub Pages (Static Web App — Free & Instant)
+This repository includes a GitHub Actions static workflow (`.github/workflows/static.yml`) that automatically deploys the frontend web app on every push to `main`:
+- **Live URL**: [https://kunalkhyade-create.github.io/-New-Personal-Finnace-Advisor-Bot-/](https://kunalkhyade-create.github.io/-New-Personal-Finnace-Advisor-Bot-/)
+- Runs 100% in the browser with zero server maintenance.
+- Works offline out of the box with the built-in **Smart Advisory Engine**.
+- Users can optionally paste their Gemini API key in the UI settings modal to activate live Gemini 2.0 AI insights.
+
+### 2. Render.com (Full-Stack Flask App — Free Cloud Service)
+To deploy the Python Flask backend with server-side Gemini API key:
+1. Go to [Render.com](https://render.com) and create a free account.
+2. Click **New +** → **Web Service** → Connect your GitHub repository:
+   `https://github.com/kunalkhyade-create/-New-Personal-Finnace-Advisor-Bot-`
+3. Configure the service:
+   - **Environment**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn app:app` (or automatically read from `Procfile`)
+4. Under **Environment Variables**, add:
+   - `GEMINI_API_KEY`: Your Google Gemini API key
+   - `SECRET_KEY`: A secure random string
+5. Click **Deploy Web Service** to get a permanent live HTTPS URL (e.g., `https://financebot.onrender.com`).
+
+### 3. Public Deployment via Ngrok (Local Tunnel)
 
 Share your locally running app with anyone on the internet using a free Ngrok tunnel.
 

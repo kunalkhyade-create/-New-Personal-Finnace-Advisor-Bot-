@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinanceBot — AI Personal Finance Advisor</title>
+  <meta name="description" content="AI-powered personal finance advisor that generates personalised budget plans, spending analysis, and saving suggestions instantly." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="static/css/style.css" />
+</head>
+<body>
+
+  <!-- ======================================================
+       HEADER
+  ====================================================== -->
+  <header class="site-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">FinanceBot</span>
+          <span class="brand-tag">AI Personal Finance Advisor</span>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <button type="button" id="api-key-btn" class="nav-badge-btn" aria-haspopup="dialog" aria-expanded="false" title="Configure Google Gemini API Key">
+          <i class="fa-solid fa-bolt"></i>
+          <span id="nav-mode-text">AI Status</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ======================================================
+       HERO
+  ====================================================== -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <h1 class="hero-title">
+        Take Control of<br/>
+        <span class="gradient-text">Your Finances</span>
+      </h1>
+      <p class="hero-subtitle">
+        Enter your income and expenses below — our AI will instantly generate a personalised budget plan,
+        analyse your spending, and suggest targeted savings strategies.
+      </p>
+      <div class="hero-stats">
+        <div class="stat-chip"><i class="fa-solid fa-brain"></i> AI-Generated Budget</div>
+        <div class="stat-chip"><i class="fa-solid fa-magnifying-glass-chart"></i> Spending Analysis</div>
+        <div class="stat-chip"><i class="fa-solid fa-piggy-bank"></i> Saving Suggestions</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       MAIN CONTENT
+  ====================================================== -->
+  <main class="main-content container">
+
+    <!-- INPUT CARD -->
+    <section class="card input-card" id="input-section">
+      <div class="card-header">
+        <i class="fa-solid fa-sliders card-header-icon"></i>
+        <h2 class="card-title">Your Financial Profile</h2>
+      </div>
+
+      <form id="finance-form" novalidate>
+
+        <!-- Income -->
+        <div class="form-group">
+          <label for="income" class="form-label">
+            <i class="fa-solid fa-indian-rupee-sign"></i> Monthly Take-Home Income
+          </label>
+          <div class="input-wrapper">
+            <span class="input-prefix">₹</span>
+            <input
+              type="number"
+              id="income"
+              name="income"
+              class="form-input"
+              placeholder="e.g. 75000"
+              min="1"
+              max="10000000"
+              required
+              aria-label="Monthly income in rupees"
+            />
+          </div>
+        </div>
+
+        <!-- Expenses Grid -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fa-solid fa-receipt"></i> Monthly Expenses
+          </label>
+          <p class="form-hint">Fill in the categories that apply. Leave others blank.</p>
+
+          <div class="expense-grid">
+            <div class="expense-item">
+              <label for="exp-rent" class="expense-label">
+                <i class="fa-solid fa-home expense-icon"></i>
+                Rent / Housing
+              </label>
+              <div class="input-wrapper small">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="exp-rent"
+                  name="rent"
+                  class="form-input expense-input"
+                  placeholder="0"
+                  min="0"
+                  max="5000000"
+                  aria-label="Rent / Housing expense"
+                />
+              </div>
+            </div>
+
+            <div class="expense-item">
+              <label for="exp-food" class="expense-label">
+                <i class="fa-solid fa-shopping-basket expense-icon"></i>
+                Groceries &amp; Food
+              </label>
+              <div class="input-wrapper small">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="exp-food"
+                  name="food"
+                  class="form-input expense-input"
+                  placeholder="0"
+                  min="0"
+                  max="5000000"
+                  aria-label="Groceries & Food expense"
+                />
+              </div>
+            </div>
+
+            <div class="expense-item">
+              <label for="exp-transport" class="expense-label">
+                <i class="fa-solid fa-car expense-icon"></i>
+                Transport
+              </label>
+              <div class="input-wrapper small">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="exp-transport"
+                  name="transport"
+                  class="form-input expense-input"
+                  placeholder="0"
+                  min="0"
+                  max="5000000"
+                  aria-label="Transport expense"
+                />
+              </div>
+            </div>
+
+            <div class="expense-item">
+              <label for="exp-dining" class="expense-label">
+                <i class="fa-solid fa-utensils expense-icon"></i>
+                Dining Out
+              </label>
+              <div class="input-wrapper small">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="exp-dining"
+                  name="dining"
+                  class="form-input expense-input"
+                  placeholder="0"
+                  min="0"
+                  max="5000000"
+                  aria-label="Dining Out expense"
+                />
+              </div>
+            </div>
+
+            <div class="expense-item">
+              <label for="exp-entertainment" class="expense-label">
+                <i class="fa-solid fa-film expense-icon"></i>
+                Entertainment
+              </label>
+              <div class="input-wrapper small">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="exp-entertainment"
+                  name="entertainment"
+                  class="form-input expense-input"
+                  placeholder="0"
+                  min="0"
+                  max="5000000"
+                  aria-label="Entertainment expense"
+                />
+              </div>
+            </div>
+
+            <div class="expense-item">
+              <label for="exp-utilities" class="expense-label">
+                <i class="fa-solid fa-bolt expense-icon"></i>
+                Utilities
+              </label>
+              <div class="input-wrapper small">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="exp-utilities"
+                  name="utilities"
+                  class="form-input expense-input"
+                  placeholder="0"
+                  min="0"
+                  max="5000000"
+                  aria-label="Utilities expense"
+                />
+              </div>
+            </div>
+
+            <div class="expense-item">
+              <label for="exp-savings" class="expense-label">
+                <i class="fa-solid fa-piggy-bank expense-icon"></i>
+                Savings
+              </label>
+              <div class="input-wrapper small">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="exp-savings"
+                  name="savings"
+                  class="form-input expense-input"
+                  placeholder="0"
+                  min="0"
+                  max="5000000"
+                  aria-label="Savings expense"
+                />
+              </div>
+            </div>
+
+            <div class="expense-item">
+              <label for="exp-health" class="expense-label">
+                <i class="fa-solid fa-heartbeat expense-icon"></i>
+                Health &amp; Medical
+              </label>
+              <div class="input-wrapper small">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="exp-health"
+                  name="health"
+                  class="form-input expense-input"
+                  placeholder="0"
+                  min="0"
+                  max="5000000"
+                  aria-label="Health & Medical expense"
+                />
+              </div>
+            </div>
+
+            <div class="expense-item">
+              <label for="exp-education" class="expense-label">
+                <i class="fa-solid fa-graduation-cap expense-icon"></i>
+                Education
+              </label>
+              <div class="input-wrapper small">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="exp-education"
+                  name="education"
+                  class="form-input expense-input"
+                  placeholder="0"
+                  min="0"
+                  max="5000000"
+                  aria-label="Education expense"
+                />
+              </div>
+            </div>
+
+            <div class="expense-item">
+              <label for="exp-shopping" class="expense-label">
+                <i class="fa-solid fa-bag-shopping expense-icon"></i>
+                Shopping
+              </label>
+              <div class="input-wrapper small">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="exp-shopping"
+                  name="shopping"
+                  class="form-input expense-input"
+                  placeholder="0"
+                  min="0"
+                  max="5000000"
+                  aria-label="Shopping expense"
+                />
+              </div>
+            </div>
+
+            <div class="expense-item">
+              <label for="exp-other" class="expense-label">
+                <i class="fa-solid fa-ellipsis expense-icon"></i>
+                Miscellaneous
+              </label>
+              <div class="input-wrapper small">
+                <span class="input-prefix">₹</span>
+                <input
+                  type="number"
+                  id="exp-other"
+                  name="other"
+                  class="form-input expense-input"
+                  placeholder="0"
+                  min="0"
+                  max="5000000"
+                  aria-label="Miscellaneous expense"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Goal -->
+        <div class="form-group">
+          <label for="goal" class="form-label">
+            <i class="fa-solid fa-bullseye"></i> Primary Financial Goal
+          </label>
+          <div class="select-wrapper">
+            <select id="goal" name="goal" class="form-select" aria-label="Select your financial goal">
+              <option value="emergency_fund">🛡️ Build Emergency Fund</option>
+              <option value="investment">📈 Start Investing (Mutual Funds / SIPs)</option>
+              <option value="vacation">✈️ Save for Vacation</option>
+              <option value="gadget">💻 Save for a Gadget</option>
+              <option value="debt_repayment">💳 Pay Off Debt</option>
+              <option value="home_purchase">🏠 Home Down Payment</option>
+              <option value="retirement">🌅 Build Retirement Corpus</option>
+              <option value="education">🎓 Education / Certification</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow"></i>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" id="submit-btn" class="btn-primary">
+          <span id="btn-text">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Analyse My Finances
+          </span>
+          <span id="btn-loader" class="btn-loader hidden" aria-hidden="true">
+            <span class="spinner"></span> Analysing...
+          </span>
+        </button>
+
+        <!-- Error message -->
+        <div id="error-banner" class="error-banner hidden" role="alert"></div>
+
+      </form>
+    </section>
+
+    <!-- ====================================================
+         RESULTS SECTION (revealed after analysis)
+    ==================================================== -->
+    <section id="results-section" class="results-section hidden" aria-live="polite">
+
+      <!-- Summary Banner -->
+      <div class="summary-banner" id="summary-banner">
+        <div class="summary-top">
+          <div class="summary-icon"><i class="fa-solid fa-circle-info"></i></div>
+          <span id="engine-badge" class="engine-badge smart"><i class="fa-solid fa-brain"></i> Smart Advisor</span>
+        </div>
+        <p id="summary-text" class="summary-text"></p>
+      </div>
+
+      <div class="results-grid">
+
+        <!-- LEFT: Budget -->
+        <div class="results-col">
+          <div class="card results-card">
+            <div class="card-header">
+              <i class="fa-solid fa-wallet card-header-icon"></i>
+              <h2 class="card-title">Personalised Budget</h2>
+            </div>
+            <div id="budget-container" class="budget-list"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Analysis + Suggestions -->
+        <div class="results-col right-col">
+
+          <!-- Spending Analysis -->
+          <div class="card results-card">
+            <div class="card-header">
+              <i class="fa-solid fa-chart-pie card-header-icon"></i>
+              <h2 class="card-title">Spending Analysis</h2>
+            </div>
+            <div id="analysis-container" class="analysis-chips"></div>
+          </div>
+
+          <!-- Saving Suggestions -->
+          <div class="card results-card">
+            <div class="card-header">
+              <i class="fa-solid fa-piggy-bank card-header-icon"></i>
+              <h2 class="card-title">Saving Suggestions</h2>
+            </div>
+            <ol id="suggestions-container" class="suggestions-list"></ol>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================
+       API KEY MODAL
+  ====================================================== -->
+  <div id="api-key-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-key modal-icon"></i>
+          <h3 id="modal-title" class="modal-title">AI Engine Settings</h3>
+        </div>
+        <button type="button" id="modal-close-btn" class="modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          FinanceBot includes a built-in <strong>Smart Financial Advisory Engine</strong> that works out of the box without requiring an API key. To activate live Google Gemini 2.0 AI responses, paste your API key below.
+        </p>
+        <div class="form-group">
+          <label for="gemini-key-input" class="form-label">Google Gemini API Key</label>
+          <div class="input-wrapper">
+            <span class="input-prefix"><i class="fa-solid fa-lock"></i></span>
+            <input
+              type="password"
+              id="gemini-key-input"
+              class="form-input"
+              placeholder="AIzaSy..."
+              autocomplete="off"
+            />
+            <button type="button" id="toggle-key-visibility" class="btn-input-action" title="Toggle visibility">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+          <span class="form-hint">
+            Get your key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          </span>
+        </div>
+        <div id="modal-feedback" class="modal-feedback hidden"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="clear-key-btn" class="btn-secondary">Use Smart Engine</button>
+        <button type="button" id="save-key-btn" class="btn-primary-sm">Save &amp; Activate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       FOOTER
+  ====================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>
+        <i class="fa-solid fa-shield-halved"></i>
+        Your financial data is processed in real-time and never stored.
+      </p>
+      <p class="footer-credit">
+        Built with <i class="fa-solid fa-heart accent"></i> using Flask &amp; Gemini AI
+      </p>
+    </div>
+  </footer>
+
+  <!-- App Script -->
+  <script src="static/js/main.js"></script>
+</body>
+</html>
